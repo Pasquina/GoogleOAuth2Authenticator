@@ -13,12 +13,14 @@ type
     procedure SetLoginHint(const Value: string);
     function GetAuthCodeGoogle: Boolean;
     function GetTokensGoogle: Boolean;
+
   protected
     { Protected declarations }
     procedure DoAuthenticate(ARequest: TCustomRESTRequest); override;
     procedure WebFormTitleChanged(
       const ATitle: string;
       var DoCloseWebView: Boolean);
+
   public
     { Public declarations }
   published
@@ -51,10 +53,8 @@ end;
 procedure TOAuth2AuthenticatorGoogle.DoAuthenticate(ARequest: TCustomRESTRequest);
 begin
   if AccessToken = '' then    // no access token; must authorize
-  begin
     if GetAuthCodeGoogle then // obtain the authorization code
       GetTokensGoogle;        // exchange auth code for access tokens
-  end;
   inherited;                  // normal processing inserts access code into request
 end;
 
