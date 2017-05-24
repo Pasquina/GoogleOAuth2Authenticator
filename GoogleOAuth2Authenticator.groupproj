@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{5483D326-1863-4273-9E5E-87A02260EE7A}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="GAuthenticator">
+        <MSBuild Projects="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj"/>
+    </Target>
+    <Target Name="GAuthenticator:Clean">
+        <MSBuild Projects="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GAuthenticator:Make">
+        <MSBuild Projects="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="GAuthenticator"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="GAuthenticator:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="GAuthenticator:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
