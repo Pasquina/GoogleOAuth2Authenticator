@@ -3,7 +3,7 @@
         <ProjectGuid>{5483D326-1863-4273-9E5E-87A02260EE7A}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj">
+        <Projects Include="GAuthenticator.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -15,13 +15,13 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="GAuthenticator">
-        <MSBuild Projects="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj"/>
+        <MSBuild Projects="GAuthenticator.dproj"/>
     </Target>
     <Target Name="GAuthenticator:Clean">
-        <MSBuild Projects="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj" Targets="Clean"/>
+        <MSBuild Projects="GAuthenticator.dproj" Targets="Clean"/>
     </Target>
     <Target Name="GAuthenticator:Make">
-        <MSBuild Projects="..\GoogleOAuth2Authenticatorx\GAuthenticator.dproj" Targets="Make"/>
+        <MSBuild Projects="GAuthenticator.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="GAuthenticator"/>

@@ -17,17 +17,14 @@ type
   protected
     { Protected declarations }
     procedure DoAuthenticate(ARequest: TCustomRESTRequest); override;
-    procedure WebFormTitleChanged(
-      const ATitle: string;
-      var DoCloseWebView: Boolean);
+    procedure WebFormTitleChanged(const ATitle: string; var DoCloseWebView: Boolean);
 
   public
     { Public declarations }
   published
     { Published declarations }
     property LoginHint: string // Google allows for a Login Hint to make the process a little eaier
-      read   FLoginHint
-      write  SetLoginHint;
+      read FLoginHint write SetLoginHint;
   end;
 
 procedure Register;
@@ -39,14 +36,12 @@ uses
 
 procedure Register;
 begin
-  RegisterComponents(
-    'REST Client',
-    [TOAuth2AuthenticatorGoogle]);
+  RegisterComponents('REST Client', [TOAuth2AuthenticatorGoogle]);
 end;
 
 { TOAuth2AuthenticatorGoogle }
 
-{ DoAuthenticate is executed as a result of a REST Request using a Client that use this
+{ DoAuthenticate is executed as a result of a REST Request using a Client that uses this
   authenticator. It first checks for an access token, and if none is found, invokes the
   authentication routines. Finally, the access token is added to the request. }
 
@@ -65,16 +60,12 @@ end;
 
 { Extract Authorization Code from the Web Form when returned by Google }
 
-procedure TOAuth2AuthenticatorGoogle.WebFormTitleChanged(
-  const ATitle: string;
-  var DoCloseWebView: Boolean);
+procedure TOAuth2AuthenticatorGoogle.WebFormTitleChanged(const ATitle: string; var DoCloseWebView: Boolean);
 begin
   if (StartsText('Success code', ATitle)) then // if success code indicated
   begin
     AuthCode := Copy(                          // save the authorization code
-      ATitle,
-      14,
-      Length(ATitle));
+      ATitle, 14, Length(ATitle));
     if (AuthCode <> '') then                   // if authorization code found
       DoCloseWebView := True;                  // close the browser form
   end;
@@ -92,21 +83,11 @@ begin
   LURL := TStringBuilder.Create; // create the URL build area
   try
     LURL.Append(AuthorizationEndpoint);
-    LURL.AppendFormat(
-      '?response_type=%s',
-      [URIEncode('code')]);
-    LURL.AppendFormat(
-      '&client_id=%s',
-      [URIEncode(ClientID)]);
-    LURL.AppendFormat(
-      '&redirect_uri=%s',
-      [URIEncode(RedirectionEndPoint)]);
-    LURL.AppendFormat(
-      '&scope=%s',
-      [URIEncode(Scope)]);
-    LURL.AppendFormat(
-      '&login_hint=%s',
-      [URIEncode(LoginHint)]);
+    LURL.AppendFormat('?response_type=%s', [URIEncode('code')]);
+    LURL.AppendFormat('&client_id=%s', [URIEncode(ClientID)]);
+    LURL.AppendFormat('&redirect_uri=%s', [URIEncode(RedirectionEndPoint)]);
+    LURL.AppendFormat('&scope=%s', [URIEncode(Scope)]);
+    LURL.AppendFormat('&login_hint=%s', [URIEncode(LoginHint)]);
     { Display the OAuth2 in a web browser }
     LBrowser := Tfrm_OAuthWebForm.Create(nil);        // create the browser form
     try
@@ -137,26 +118,11 @@ begin
     LRequest.Method := rmPOST;
     LRequest.Resource := ExRequestResource;
     // required parameters
-    LRequest.AddParameter(
-      ExCode,
-      AuthCode,
-      pkGETorPOST);
-    LRequest.AddParameter(
-      ExClientID,
-      ClientID,
-      pkGETorPOST);
-    LRequest.AddParameter(
-      ExClientSecret,
-      ClientSecret,
-      pkGETorPOST);
-    LRequest.AddParameter(
-      ExRedirectURI,
-      RedirectionEndPoint,
-      pkGETorPOST);
-    LRequest.AddParameter(
-      ExGrantType,
-      ExAuthorizationCode,
-      pkGETorPOST);
+    LRequest.AddParameter(ExCode, AuthCode, pkGETorPOST);
+    LRequest.AddParameter(ExClientID, ClientID, pkGETorPOST);
+    LRequest.AddParameter(ExClientSecret, ClientSecret, pkGETorPOST);
+    LRequest.AddParameter(ExRedirectURI, RedirectionEndPoint, pkGETorPOST);
+    LRequest.AddParameter(ExGrantType, ExAuthorizationCode, pkGETorPOST);
 
     LRequest.Execute;                 // attempt token exchange
 
@@ -175,8 +141,7 @@ begin
     if LRequest.Response.GetSimpleValue(ExExpiresIn, LToken) then
     begin
       AccessTokenExpiry := IncSecond( // save token expiry as datetime
-        Now(),
-        LToken.ToInteger);
+        Now(), LToken.ToInteger);
     end;
 
     if (AccessToken <> '') and (RefreshToken <> '') then
