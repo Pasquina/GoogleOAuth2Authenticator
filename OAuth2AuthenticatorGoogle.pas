@@ -6,6 +6,7 @@ uses
   System.SysUtils, System.Classes, Data.Bind.Components, Data.Bind.ObjectScope, REST.Client, REST.Authenticator.OAuth;
 
 type
+  [ComponentPlatformsAttribute(pidWin32 or pidWin64)]
   TOAuth2AuthenticatorGoogle = class(TOAuth2Authenticator)
   private
     { Private declarations }
@@ -27,17 +28,10 @@ type
       read FLoginHint write SetLoginHint;
   end;
 
-procedure Register;
-
 implementation
 
 uses
   REST.Authenticator.OAuth.WebForm.Win, REST.Utils, System.StrUtils, VCL.Dialogs, REST.Types, pCons, System.DateUtils;
-
-procedure Register;
-begin
-  RegisterComponents('REST Client', [TOAuth2AuthenticatorGoogle]);
-end;
 
 { TOAuth2AuthenticatorGoogle }
 

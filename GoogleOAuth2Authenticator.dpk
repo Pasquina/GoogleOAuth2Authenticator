@@ -1,4 +1,4 @@
-package GAuthenticator;
+package GoogleOAuth2Authenticator;
 
 {$R *.res}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
@@ -25,24 +25,23 @@ package GAuthenticator;
 {$IMAGEBASE $400000}
 {$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'Extensions to OAuth2Authenticator to support unique Google requirements.'}
+{$DESCRIPTION 'OAuth2Authenicator for Google'}
+{$LIBPREFIX 'dcl'}
 {$LIBSUFFIX '240'}
-{$RUNONLY}
+{$DESIGNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
   rtl,
-  bindcomp,
-  dbrtl,
-  bindengine,
-  RESTComponents,
-  CustomIPTransport,
   vcl,
   vclie,
-  VCLRESTComponents;
+  CustomIPTransport,
+  bindengine,
+  bindcomp,
+  VCLRESTComponents,
+  RESTComponents;
 
 contains
-  OAuth2AuthenticatorGoogle in 'OAuth2AuthenticatorGoogle.pas',
-  pCons in 'pCons.pas';
+  AuthenticatorDesign in 'AuthenticatorDesign.pas';
 
 end.
