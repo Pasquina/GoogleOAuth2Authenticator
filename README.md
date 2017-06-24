@@ -1,12 +1,11 @@
 # GoogleOAuth2Authenticator
 ## Delphi OAuth2 Authenticator Component
 
-This component is descended from the TOAuth2Authenticator provided by Embarcadero. It makes extenstion to the Embarcadero component
-that support the Google implementation of OAuth2.
+This component is descended from the TOAuth2Authenticator provided by Embarcadero. It makes extenstion to the Embarcadero component that support the Google implementation of OAuth2.
 
 ## Caveats
 
-  * The code provided has only been tested for Windows VCL 32-bit.
+  * The code provided has been tested for Windows VCL 32-bit and VCL 64-bit.
   * Because the code uses a TBrowser component, additional development is required to also support FireMonkey and (if possible) Unix.
 
 ## Usage
