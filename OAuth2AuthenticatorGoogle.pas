@@ -31,7 +31,7 @@ type
 implementation
 
 uses
-  REST.Authenticator.OAuth.WebForm.Win, REST.Utils, System.StrUtils, VCL.Dialogs, REST.Types, pCons, System.DateUtils;
+  REST.Authenticator.OAuth.WebForm.Win, REST.Utils, System.StrUtils, VCL.Dialogs, REST.Types, pOA2Cons, System.DateUtils;
 
 { TOAuth2AuthenticatorGoogle }
 
