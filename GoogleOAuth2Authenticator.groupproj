@@ -9,6 +9,15 @@
         <Projects Include="GoogleOAuth2Authenticator.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="QAuthenticator\QAuthenticator.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Logger\VDLogger.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Etc\VDEtc.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +44,41 @@
     <Target Name="GoogleOAuth2Authenticator:Make">
         <MSBuild Projects="GoogleOAuth2Authenticator.dproj" Targets="Make"/>
     </Target>
+    <Target Name="QAuthenticator">
+        <MSBuild Projects="QAuthenticator\QAuthenticator.dproj"/>
+    </Target>
+    <Target Name="QAuthenticator:Clean">
+        <MSBuild Projects="QAuthenticator\QAuthenticator.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="QAuthenticator:Make">
+        <MSBuild Projects="QAuthenticator\QAuthenticator.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="VDLogger">
+        <MSBuild Projects="Logger\VDLogger.dproj"/>
+    </Target>
+    <Target Name="VDLogger:Clean">
+        <MSBuild Projects="Logger\VDLogger.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VDLogger:Make">
+        <MSBuild Projects="Logger\VDLogger.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="VDEtc">
+        <MSBuild Projects="Etc\VDEtc.dproj"/>
+    </Target>
+    <Target Name="VDEtc:Clean">
+        <MSBuild Projects="Etc\VDEtc.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="VDEtc:Make">
+        <MSBuild Projects="Etc\VDEtc.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="GAuthenticator;GoogleOAuth2Authenticator"/>
+        <CallTarget Targets="GAuthenticator;GoogleOAuth2Authenticator;QAuthenticator;VDLogger;VDEtc"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="GAuthenticator:Clean;GoogleOAuth2Authenticator:Clean"/>
+        <CallTarget Targets="GAuthenticator:Clean;GoogleOAuth2Authenticator:Clean;QAuthenticator:Clean;VDLogger:Clean;VDEtc:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="GAuthenticator:Make;GoogleOAuth2Authenticator:Make"/>
+        <CallTarget Targets="GAuthenticator:Make;GoogleOAuth2Authenticator:Make;QAuthenticator:Make;VDLogger:Make;VDEtc:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

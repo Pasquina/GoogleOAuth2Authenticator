@@ -1,7 +1,6 @@
-package GoogleOAuth2Authenticator;
+package VDEtc;
 
 {$R *.res}
-{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -26,23 +25,15 @@ package GoogleOAuth2Authenticator;
 {$IMAGEBASE $400000}
 {$DEFINE RELEASE}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'OAuth2Authenicator for Google'}
-{$LIBPREFIX 'dcl'}
+{$DESCRIPTION 'Program Constants Used By Several Other Components'}
 {$LIBSUFFIX AUTO}
-{$DESIGNONLY}
+{$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl,
-  vcl,
-  vclie,
-  CustomIPTransport,
-  bindengine,
-  bindcomp,
-  VCLRESTComponents,
-  RESTComponents;
+  rtl;
 
 contains
-  AuthenticatorDesign in 'AuthenticatorDesign.pas';
+  pVDEtc in 'pVDEtc.pas';
 
 end.

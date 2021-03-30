@@ -4,11 +4,8 @@ interface
 
 const
 
-  { From https://accounts.google.com/.well-known/openid-configuration and
-    https://developers.google.com/identity/protocols/OAuth2InstalledApp }
+{ General constants used by most OAuth2 architectural styles for various purposes.  }
 
-  ExBaseURL                = 'https://www.googleapis.com';
-  ExRequestResource        = 'oauth2/v4/token';
   ExCode                   = 'code';
   ExClientID               = 'client_id';
   ExClientSecret           = 'client_secret';

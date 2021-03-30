@@ -6,11 +6,13 @@ procedure Register;
 
 implementation
 
-uses OAuth2AuthenticatorGoogle, System.Classes;
+uses OAuth2AuthenticatorGoogle, pVDEtc, pVDLogger, System.Classes;
 
 procedure Register;
 begin
-  RegisterComponents('REST Client', [TOAuth2AuthenticatorGoogle]);
+  RegisterComponents('REST Client', [TOAuth2AuthenticatorGoogle,
+                                     TVDEtc,
+                                     TVDLogger]);
 end;
 
 end.

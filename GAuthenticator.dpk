@@ -26,7 +26,7 @@ package GAuthenticator;
 {$DEFINE RELEASE}
 {$ENDIF IMPLICITBUILDING}
 {$DESCRIPTION 'Extensions to OAuth2Authenticator to support unique Google requirements.'}
-{$LIBSUFFIX '240'}
+{$LIBSUFFIX AUTO}
 {$RUNONLY}
 {$IMPLICITBUILD OFF}
 
@@ -42,7 +42,7 @@ requires
   VCLRESTComponents;
 
 contains
-  OAuth2AuthenticatorGoogle in 'OAuth2AuthenticatorGoogle.pas',
-  pOA2Cons in 'pOA2Cons.pas';
+  pOA2Cons in 'pOA2Cons.pas',
+  OAuth2AuthenticatorGoogle in 'OAuth2AuthenticatorGoogle.pas';
 
 end.

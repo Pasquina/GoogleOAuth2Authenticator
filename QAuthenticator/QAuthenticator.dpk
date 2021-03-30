@@ -1,7 +1,6 @@
-package GoogleOAuth2Authenticator;
+package QAuthenticator;
 
 {$R *.res}
-{$R *.dres}
 {$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
 {$ALIGN 8}
 {$ASSERTIONS ON}
@@ -10,39 +9,32 @@ package GoogleOAuth2Authenticator;
 {$EXTENDEDSYNTAX ON}
 {$IMPORTEDDATA ON}
 {$IOCHECKS ON}
-{$LOCALSYMBOLS OFF}
+{$LOCALSYMBOLS ON}
 {$LONGSTRINGS ON}
 {$OPENSTRINGS ON}
-{$OPTIMIZATION ON}
+{$OPTIMIZATION OFF}
 {$OVERFLOWCHECKS OFF}
 {$RANGECHECKS OFF}
-{$REFERENCEINFO OFF}
+{$REFERENCEINFO ON}
 {$SAFEDIVIDE OFF}
-{$STACKFRAMES OFF}
+{$STACKFRAMES ON}
 {$TYPEDADDRESS OFF}
 {$VARSTRINGCHECKS ON}
 {$WRITEABLECONST OFF}
 {$MINENUMSIZE 1}
 {$IMAGEBASE $400000}
-{$DEFINE RELEASE}
+{$DEFINE DEBUG}
 {$ENDIF IMPLICITBUILDING}
-{$DESCRIPTION 'OAuth2Authenicator for Google'}
-{$LIBPREFIX 'dcl'}
+{$DESCRIPTION 'Quickbooks Authenticator for REST Request/Client'}
 {$LIBSUFFIX AUTO}
-{$DESIGNONLY}
+{$RUNONLY}
 {$IMPLICITBUILD OFF}
 
 requires
-  rtl,
-  vcl,
-  vclie,
-  CustomIPTransport,
-  bindengine,
-  bindcomp,
-  VCLRESTComponents,
-  RESTComponents;
+  rtl;
 
 contains
-  AuthenticatorDesign in 'AuthenticatorDesign.pas';
+  pQOAuth2Authenticator in 'pQOAuth2Authenticator.pas',
+  pCons in '..\Common\pCons.pas';
 
 end.
