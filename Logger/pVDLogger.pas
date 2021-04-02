@@ -11,30 +11,36 @@ type
   TLogSources = set of TLogSource;
   SLogSource = String;
 
+  ELogFileError = class(Exception);
+  ELogFileNoParams = class(ELogFileError);
+
   [ComponentPlatformsAttribute(pidWin32 or pidWin64)]
   TVDLogger = class(TComponent)
   private
     FLogFileName: TFileName;
     FLogFile: TFileStream;
-    FLogFilePath: TFilename;
+    FLogFilePath: TFileName;
     FEtc: TVDEtc;
     procedure SetLogFileName(const Value: TFileName);
     procedure SetLogFile(const Value: TFileStream);
-    procedure SetLogFilePath(const Value: TFilename);
+    procedure SetLogFilePath(const Value: TFileName);
     procedure SetEtc(const Value: TVDEtc);
     procedure CalcLogFileLocs(const AEtc: TVDEtc);
     property LogFile: TFileStream read FLogFile write SetLogFile;
-    property LogFilePath: TFilename read FLogFilePath write SetLogFilePath;
   protected
-    property LogFileName: TFileName read FLogFileName write SetLogFileName;
-    function FormatLogHeader(const ATimeStamp: TDateTime;
-  ALogSource: TLogSource): String;
+    function FormatLogHeader(const ATimeStamp: TDateTime; ALogSource: TLogSource): String;
+    procedure Loaded; override;
   public
-    procedure LogText(const ALogSource: TLogSource; const AMsgText: TStrings);
+    procedure LogStrings(const ALogSource: TLogSource; const AMsgText: TStringList); overload;
+    procedure LogStrings(const ALogSource: TLogSource; const AMsgText: TStrings); overload;
     procedure LogLine(const ALogSource: TLogSource; const AMsgLine: array of String);
     procedure ShowLog;
     function CycleLogfile: Boolean;
-    constructor Create(AOwner: TComponent);  override;
+    function GetLogFilePath: TFileName;
+    function GetLogFileName: TFileName;
+    property LogFileName: TFileName read GetLogFileName write SetLogFileName;
+    property LogFilePath: TFileName read GetLogFilePath write SetLogFilePath;
+    constructor Create(AOwner: TComponent); override;
   published
     property Etc: TVDEtc read FEtc write SetEtc;
   end;
@@ -46,24 +52,32 @@ const
 implementation
 
 uses
-  System.DateUtils;
+  System.DateUtils, VCL.Dialogs, VCL.Forms, fmVDLogger;
 
 { TVDLogger }
 
+{ Application constants are universally specified in the Etc component. This
+  retrieves the values for the log path and file name for ongoing use. }
+
 procedure TVDLogger.CalcLogFileLocs(const AEtc: TVDEtc);
 begin
-  if Assigned(AEtc) then
-  with AEtc do
-  begin
-    LogFilePath := TPath.Combine(TPath.Combine(GetHomePath, Vendor), App);
-    LogFileName := TPath.Combine(LogFilePath, LogFile);
+  try
+    if not Assigned(AEtc) then                   // be sure Etc component is assigned
+      raise ELogFileNoParams.Create('Missing reference to Etc component.');
+    with AEtc do                                 // need Vendor, App and Filename
+      begin                                      // create the filename and path
+        LogFilePath := TPath.Combine(TPath.Combine(GetHomePath, Vendor), App);
+        LogFileName := TPath.Combine(LogFilePath, LogFile);
+      end;
+  except
+    on E: ELogFileNoParams do                    // missing etc component
+      MessageDlg(E.Message, mtError, [mbOK], 0); // inform tdhe usere
   end;
 end;
 
 constructor TVDLogger.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-  CalcLogFileLocs(Etc);
+  inherited Create(AOwner);                      // not much to see here
 end;
 
 { To start a new log file the old file is simply renamed with the current timestamp.
@@ -89,12 +103,33 @@ begin
     Result := False;
 end;
 
-function TVDLogger.FormatLogHeader(const ATimeStamp: TDateTime;
-  ALogSource: TLogSource): String;
+{ Formatting the log source converts the enumeration received to a readable string. The
+  Timestamp is formatted as an ISO8601 date and time. }
+
+function TVDLogger.FormatLogHeader(const ATimeStamp: TDateTime; ALogSource: TLogSource): String;
 const
-  LLogHeaderMask: String = '**** %s; Source: %s';
-begin
+  LLogHeaderMask: String = '**** %s; Source: %s';        // format string
+begin                                                    // is this thread safe?
   Result := Format(LLogHeaderMask, [DateToISO8601(ATimeStamp, False), SLogSources[ALogSource]]);
+end;
+
+function TVDLogger.GetLogFileName: TFileName;
+begin
+  Result := FLogFileName;                                // return the log filename already determined
+end;
+
+function TVDLogger.GetLogFilePath: TFileName;
+begin
+  Result := FLogFilePath;                                // return the log path already determined
+end;
+
+{ Now that all components have been loaded we can obtain the full path and file
+  name of the log file from the Etc component. }
+
+procedure TVDLogger.Loaded;
+begin
+  Inherited;
+  CalcLogFileLocs(Etc);                                  // obtain and save the log file path and file name
 end;
 
 { Logging a series of single lines causes a stringlist to be built. Then the LogText procedure is
@@ -102,39 +137,63 @@ end;
 
 procedure TVDLogger.LogLine(const ALogSource: TLogSource; const AMsgLine: array of String);
 var
-  LMessageList: TStringList;
-  LMessageLine: String;
+  LMessageList: TStringList;                             // work list
+  LMessageLine: String;                                  // for iteration
 begin
-  LMessageList := TStringList.Create;
+  LMessageList := TStringList.Create;                    // create the work list
   try
-    for LMessageLine in AMsgLine do
-      LMessageList.Add(LMessageLine);
-    LogText(ALogSource, LMessageList);
+    for LMessageLine in AMsgLine do                      // prdocess each line of the input arrayi
+      LMessageList.Add(LMessageLine);                    // add the line to the stringlist
+    LogStrings(ALogSource, LMessageList);                   // invoke the log list procedure
   finally
-    LMessageList.Free;
+    LMessageList.Free;                                   // return the resource
   end;
 end;
 
-procedure TVDLogger.LogText(const ALogSource: TLogSource; const AMsgText: TStrings);
+{ This overload is intended primarily as a workaround for handling TMemo lines, that
+  are actually TMemoStrings, not TStrings. TMemoStrings do not handle TrailingLineBreak
+  correctly (it is completely ignored). Hence we need to build a real TStringList
+  for submission tdo the LogStrings Routine. }
+
+procedure TVDLogger.LogStrings(const ALogSource: TLogSource;
+  const AMsgText: TStrings);
 var
-  LMode: Word;
-  LMsgTimeStamp: String;
+  LStringList: TStringList;              // string list to receive input lines
 begin
-  if not FileExists(LogFileName) then
-    begin
-      ForceDirectories(LogFilePath);
-      LMode := fmCreate;
-    end
-    else
-      LMode := fmOpenReadWrite;
-  LogFile := TFileStream.Create(LogFileName, LMode or fmShareDenyWrite);
+  LStringList := TStringList.Create;     // create the string list
   try
-    LogFile.Seek(0, soFromEnd);
-    LMsgTimeStamp := FormatLogHeader(Now(), ALogSource);
-    AMsgText.Insert(0, LMsgTimeStamp);
-    AMsgText.SaveToStream(LogFile, TEncoding.UTF8);
+    LStringList.Assign(AMsgText);        // assign the input lines to the stringlist
+    LogStrings(ALogSource, LStringList); // invoke the logging routine using the new list
   finally
-    LogFile.Free;
+    LStringList.Free;                    // return resources after all done
+  end;
+end;
+
+{ General purpose routine that logs a stringlist. Note that the so-called TStrings of a TMemo
+  are not suitable for this routine. The overloaded method that accepts TStrings should be used
+  instead. }
+
+procedure TVDLogger.LogStrings(const ALogSource: TLogSource; const AMsgText: TStringList);
+var
+  LMode: Word;                                           // log file mode
+  LMsgTimeStamp: String;                                 // time stamp appended as first line
+begin
+  if not FileExists(LogFileName) then                    // check for presence of existing log file
+    begin
+      ForceDirectories(LogFilePath);                     // if no file, ensure the path exists
+      LMode := fmCreate;                                 // create the file since none exists
+    end
+  else
+    LMode := fmOpenReadWrite;                            // if file exists, simply append
+
+  LogFile := TFileStream.Create(LogFileName, LMode or fmShareDenyWrite); // create the stream writer
+  try
+    LogFile.Seek(0, soFromEnd);                          // position at the end of the file
+    LMsgTimeStamp := FormatLogHeader(Now(), ALogSource); // format the timestamp (local time)
+    AMsgText.Insert(0, LMsgTimeStamp);                   // insert the timestamp as the first line
+    AMsgText.SaveToStream(LogFile, TEncoding.UTF8);      // write the completed set of lines to the log
+  finally
+    LogFile.Free;                                        // return resources
   end;
 end;
 
@@ -153,7 +212,7 @@ begin
   FLogFileName := Value;
 end;
 
-procedure TVDLogger.SetLogFilePath(const Value: TFilename);
+procedure TVDLogger.SetLogFilePath(const Value: TFileName);
 begin
   FLogFilePath := Value;
 end;
@@ -162,16 +221,17 @@ end;
   file name is stored as a property of the class. }
 
 procedure TVDLogger.ShowLog;
-//var
-//  LgMemoDisplay: TgMemoDisplay;                   // pointer to the form for display
+var
+  LgMemoDisplay: tgLogger;                           // pointer to the form for display
 begin
-//  if FileExists(LogFileName) then                 // first make sure we actually have a log file
-//    begin
+  if FileExists(LogFileName) then                 // first make sure we actually have a log file
+    begin
+      LgMemoDisplay := tgLogger.CreateLog(Self, LogFileName);
 //      LgMemoDisplay := TgMemoDisplay.CreateAux(Self, LogFileName); // create the window
-//      LgMemoDisplay.Show;                         // show triggers the log file retrieval
-//    end
-//  else
-//    ShowMessage('There is no current log file.'); // inform the user if there is no current log file
+      LgMemoDisplay.Show;                         // show triggers the log file retrieval
+    end
+  else
+    ShowMessage('There is no current log file.'); // inform the user if there is no current log file
 end;
 
 end.
